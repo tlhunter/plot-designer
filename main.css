@@ -2,6 +2,9 @@ body, html {
 	margin: 0;
 	padding: 10px;
 }
+body, textarea {
+	font-family: sans-serif;
+}
 
 .act {
 	display: block;
@@ -19,6 +22,7 @@ body, html {
 }
 .title {
 	font-weight: bold;
+	padding: 10px 0 0 10px;
 }
 
 .drop-group {
@@ -28,18 +32,18 @@ body, html {
 	align-items: flex-start;
 }
 .drop-target {
-	border: 1px solid grey;
-	background-color: light-grey;
+	border: 1px solid #eee;
+	background-color: #fafafa;
 	margin: 10px 0;
 }
 .droppable {
-	height: 100px;
+	min-height: 100px;
 	margin: 10px 0;
 }
 
 .card {
-	background-color: yellow;
-	border: brown;
+	background-color: ##fcffb8;
+	border: 1px solid #e1e84d;
 	height: 100px;
 	width: 100px;
 	text-overflow: hidden;
@@ -60,9 +64,19 @@ body, html {
 }
 .card, .card textarea {
 	font-size: 10px;
-	font-family: sans-serif;
 }
 
 .drop-group .drop-target {
-	flex: 1 auto;
+	flex: 1;
+}
+
+#zone-toolbar {
+	display: inline-block;
+}
+#zone-trash {
+	display: inline-block;
+}
+.droppable .label {
+	position: absolute;
+	
 }

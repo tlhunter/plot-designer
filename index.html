@@ -2,13 +2,17 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
+		<title>Story Plot UI</title>
 		<link href="./dragula.min.css" rel="stylesheet" type="text/css" />
 		<link href="./main.css" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
 		<div id="toolbar">
-			<div class="droppable">
-				<div class="card">new card</div>
+			<div class="droppable" id="zone-toolbar">
+				<div class="card"><textarea>new card</textarea></div>
+			</div>
+			<div class="droppable" id="zone-trash">
+				<div class="label">Trash</div>
 			</div>
 		</div>
 		<div id="container">
@@ -16,36 +20,32 @@
 				<div class="full-title">ACT I</div>
 				<div class="drop-group">
 					<div class="drop-target">
-						<div class="title">setup</div>
-						<div class="droppable">
-							<div class="card card-pre"><textarea>opening image</textarea></div>
-							<div class="card card-pre">theme stated</div>
-							<div class="card card-pre">catalyst</div>
-						</div>
+						<div class="title">Setup</div>
+						<div class="droppable" id="zone-setup"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">debate</div>
-						<div class="droppable"></div>
+						<div class="title">Debate</div>
+						<div class="droppable" id="zone-debate"></div>
 					</div>
 				</div>
 			</div>
 			<div id="act-2a" class="act">
-				<div class="full-title">ACT IIa</div>
+				<div class="full-title">ACT II</div>
 				<div class="drop-target">
-					<div class="title">fun and games</div>
-					<div class="droppable"></div>
+					<div class="title">Fun and Games</div>
+					<div class="droppable" id="zone-rise"></div>
 				</div>
 			</div>
 			<div id="act-2b" class="act">
-				<div class="full-title">ACT IIb</div>
+				<!-- <div class="full-title">ACT IIb</div> -->
 				<div class="drop-group">
 					<div class="drop-target">
-						<div class="title">bad guys close in</div>
-						<div class="droppable"></div>
+						<div class="title">Bad Guys Close In</div>
+						<div class="droppable" id="zone-fall"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">dark night of the soul</div>
-						<div class="droppable"></div>
+						<div class="title">Dark Night of the Soul</div>
+						<div class="droppable" id="zone-dark"></div>
 					</div>
 				</div>
 			</div>
@@ -53,24 +53,24 @@
 				<div class="full-title">ACT III</div>
 				<div class="drop-group">
 					<div class="drop-target">
-						<div class="title">1</div>
-						<div class="droppable"></div>
+						<div class="title">Gathering the Team</div>
+						<div class="droppable" id="zone-finale-1"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">2</div>
-						<div class="droppable"></div>
+						<div class="title">Executing the Plan</div>
+						<div class="droppable" id="zone-finale-2"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">3</div>
-						<div class="droppable"></div>
+						<div class="title">High Tower Surprise</div>
+						<div class="droppable" id="zone-finale-3"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">4</div>
-						<div class="droppable"></div>
+						<div class="title">Dig Deep Down</div>
+						<div class="droppable" id="zone-finale-4"></div>
 					</div>
 					<div class="drop-target">
-						<div class="title">5</div>
-						<div class="droppable"></div>
+						<div class="title">Execute New Plan</div>
+						<div class="droppable" id="zone-finale-5"></div>
 					</div>
 				</div>
 			</div>

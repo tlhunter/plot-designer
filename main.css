@@ -1,0 +1,68 @@
+body, html {
+	margin: 0;
+	padding: 10px;
+}
+
+.act {
+	display: block;
+}
+.width-100 {
+	width: 100%;
+}
+.width-50 {
+	width: 49.5%;
+}
+
+.full-title {
+	font-weight: bold;
+	font-size: 30px;
+}
+.title {
+	font-weight: bold;
+}
+
+.drop-group {
+	display: flex;
+	grid-gap: 0px 10px;
+	align-content: stretch;
+	align-items: flex-start;
+}
+.drop-target {
+	border: 1px solid grey;
+	background-color: light-grey;
+	margin: 10px 0;
+}
+.droppable {
+	height: 100px;
+	margin: 10px 0;
+}
+
+.card {
+	background-color: yellow;
+	border: brown;
+	height: 100px;
+	width: 100px;
+	text-overflow: hidden;
+	margin-left: 10px;
+	display: inline-block;
+	box-sizing: border-box;
+	padding: 10px;
+	overflow: hidden;
+}
+.card textarea {
+	background-color: transparent;
+	padding: 0;
+	border: 0;
+	color: black;
+	width: 80px;
+	height: 80px;
+	resize: unset;
+}
+.card, .card textarea {
+	font-size: 10px;
+	font-family: sans-serif;
+}
+
+.drop-group .drop-target {
+	flex: 1 auto;
+}

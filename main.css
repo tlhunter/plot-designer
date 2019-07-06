@@ -4,6 +4,7 @@ body, html {
 }
 body, textarea {
 	font-family: sans-serif;
+	color: #000;
 }
 
 .act {
@@ -23,6 +24,7 @@ body, textarea {
 .title {
 	font-weight: bold;
 	padding: 10px 0 0 10px;
+	text-align: center;
 }
 
 .drop-group {
@@ -37,12 +39,12 @@ body, textarea {
 	margin: 10px 0;
 }
 .droppable {
-	min-height: 100px;
+	min-height: 102px; /* 100 height of card + 2px border */
 	margin: 10px 0;
 }
 
 .card {
-	background-color: ##fcffb8;
+	background-color: #fcffb8;
 	border: 1px solid #e1e84d;
 	height: 100px;
 	width: 100px;
@@ -50,17 +52,16 @@ body, textarea {
 	margin-left: 10px;
 	display: inline-block;
 	box-sizing: border-box;
-	padding: 10px;
+	padding: 5px;
 	overflow: hidden;
 }
 .card textarea {
 	background-color: transparent;
 	padding: 0;
 	border: 0;
-	color: black;
-	width: 80px;
-	height: 80px;
-	resize: unset;
+	width: 90px;
+	height: 90px;
+	resize: unset; /* gets weird with dragula */
 }
 .card, .card textarea {
 	font-size: 10px;

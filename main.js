@@ -139,7 +139,24 @@ drake.on('drop', (el, target, source, sibling) => {
     return;
   }
 
-  el.getElementsByTagName('textarea')[0].focus();
+  const textarea = el.getElementsByTagName('textarea')[0];
+
+  if (!textarea) {
+    console.error("CANNOT FIND TEXTAREA", el);
+    return;
+  }
+
+  // remove old value and focus for ease of editing
+  textarea.value = "";
+  textarea.focus();
+});
+
+drake.on('over', (el, container, source) => {
+  container.classList.add('hover');
+});
+
+drake.on('out', (el, container, source) => {
+  container.classList.remove('hover');
 });
 
 console.log('hey');

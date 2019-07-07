@@ -129,7 +129,7 @@ const drake = dragula(el_all, {
 drake.on('drop', (el, target, source, sibling) => {
   const zone = element_to_zone.get(target);
   if (!zone) {
-    console.error("CANNOT FIND ZONE", el, target, source);
+    // card was dropped somewhere random, ignore it
     return;
   }
 
@@ -147,7 +147,7 @@ drake.on('drop', (el, target, source, sibling) => {
   }
 
   // remove old value and focus for ease of editing
-  textarea.value = "";
+  // textarea.value = "";
   textarea.focus();
 });
 

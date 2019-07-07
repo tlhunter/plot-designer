@@ -43,9 +43,19 @@ body, textarea {
 	margin: 10px 0;
 }
 
-.card {
+.card-yellow {
 	background-color: #fcffb8;
 	border: 1px solid #e1e84d;
+}
+.card-blue {
+	background-color: #b8d5ff;
+	border: 1px solid #4d9ae8;
+}
+.card-red {
+	background-color: #ffb8b8;
+	border: 1px solid #e84d4d;
+}
+.card {
 	height: 100px;
 	width: 100px;
 	text-overflow: hidden;
@@ -80,4 +90,8 @@ body, textarea {
 .droppable .label {
 	position: absolute;
 	
+}
+
+#zone-toolbar .card textarea {
+	display: none;
 }

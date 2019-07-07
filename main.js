@@ -149,6 +149,15 @@ drake.on('drop', (el, target, source, sibling) => {
   // remove old value and focus for ease of editing
   // textarea.value = "";
   textarea.focus();
+
+  const hint = el.getElementsByClassName('hint')[0];
+
+  if (!hint) {
+    // dropping between two fields, not cloning
+    return;
+  }
+
+  hint.parentNode.removeChild(hint);
 });
 
 drake.on('over', (el, container, source) => {

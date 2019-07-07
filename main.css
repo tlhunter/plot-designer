@@ -39,7 +39,8 @@ body, textarea {
 	margin: 10px 0;
 }
 .droppable {
-	min-height: 102px; /* 100 height of card + 2px border */
+	min-height: 104px; /* 100 height of card + 2px border */
+	min-width: 104px; /* 100 height of card + 2px border */
 	margin: 10px 0;
 }
 
@@ -77,6 +78,13 @@ body, textarea {
 	font-size: 10px;
 }
 
+.hint {
+	text-align: center;
+	display: block;
+	font-weight: bold;
+	line-height: 80px;
+}
+
 .drop-group .drop-target {
 	flex: 1;
 }
@@ -86,10 +94,16 @@ body, textarea {
 }
 #zone-trash {
 	display: inline-block;
+	margin-left: 10px;
+	border: 1px dotted red;
 }
-.droppable .label {
+#zone-trash .label {
+	display: block;
+	text-align: center;
+	line-height: 90px;
+	color: red;
 	position: absolute;
-	
+	width: 100px;
 }
 
 #zone-toolbar .card textarea {

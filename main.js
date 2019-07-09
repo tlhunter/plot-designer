@@ -145,40 +145,36 @@ drake.on('drop', (el, target, source, sibling) => {
     return;
   }
 
+  let card_id = el.dataset.id;
+
   if (zone.trash) {
-    console.log('DESTROY');
+    console.log('DESTROY', card_id);
     el.parentNode.removeChild(el);
+    // if user is dropping a new card there will be no ID
+    if (card_id) {
+      card_destroy(card_id);
+    }
     return;
   }
-
-  const textarea = el.getElementsByTagName('textarea')[0];
-
-  if (!textarea) {
-    console.error("CANNOT FIND TEXTAREA", el);
-    return;
-  }
-
-  // remove old value and focus for ease of editing
-  // textarea.value = "";
-  textarea.focus();
-
-  const hint = el.getElementsByClassName('hint')[0];
-
-  if (!hint) {
-    // dropping between two fields, not cloning
-    return;
-  }
-
-  hint.parentNode.removeChild(hint);
 
   let sibling_id = null;
   if (sibling) {
     sibling_id = sibling.dataset.id;
   }
 
-  const card_id = card_create(zone.name, sibling_id);
+  if (card_id) {
+    // MOVE CARD
+    card_move(zone.name, sibling_id, card_id);
+  } else {
+    // CREATE CARD
+    card_id = card_create(zone.name, sibling_id);
+    el.dataset.id = card_id;
 
-  el.dataset.id = card_id;
+    const hint = el.getElementsByClassName('hint')[0];
+    hint.parentNode.removeChild(hint);
+  }
+
+  el.getElementsByTagName('textarea')[0].focus();
 });
 
 drake.on('over', (el, container, source) => {
@@ -190,8 +186,8 @@ drake.on('out', (el, container, source) => {
 });
 
 // Dragula provides the next/right sibling ID, not the previous/left
-function card_create(zonename, sibling_id) {
-  const zone = zonename_to_zone.get(zonename);
+function card_create(zone_name, sibling_id) {
+  const zone = zonename_to_zone.get(zone_name);
   const id = uuid();
 
   const card = {
@@ -235,7 +231,27 @@ function card_destroy(card_id) {
   delete card_state.cards[card_id];
 }
 
-function card_move() {
+function card_move(new_zone_name, sibling_id, card_id) {
+  console.log('MOVE', arguments);
+  const card = card_state.cards[card_id];
+
+  const old_zone_name = card.zone;
+  card.zone = new_zone_name;
+
+  console.log('old', old_zone_name);
+  const index = card_state.zones[old_zone_name].indexOf(card_id);
+  console.log('old move index', index);
+  card_state.zones[old_zone_name].splice(index, 1); // remove from old
+
+  if (sibling_id) {
+    const sibling_index = card_state.zones[new_zone_name].indexOf(sibling_id);
+    card_state.zones[new_zone_name].splice(sibling_index, 0, card_id);
+  } else {
+    if (!card_state.zones[new_zone_name]) {
+      card_state.zones[new_zone_name] = [];
+    }
+    card_state.zones[new_zone_name].push(card_id);
+  }
 }
 
 function uuid() {

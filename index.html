@@ -7,12 +7,16 @@
 		<link href="./main.css" rel="stylesheet" type="text/css" />
 	</head>
 	<body>
+		<div id="meta">
+			<button id="action-import">import</button>
+			<button id="action-export">export</button>
+		</div>
 		<div id="toolbar">
 			<div class="drop-group">
 				<div class="droppable" id="zone-toolbar">
-					<div class="card card-yellow"><span class="hint">New Scene</span><textarea></textarea></div>
-					<div class="card card-red"><span class="hint">New STC Scene</span><textarea></textarea></div>
-					<div class="card card-blue"><span class="hint">New Note</span><textarea></textarea></div>
+					<div class="card card-yellow" data-cardtype="yellow"><span class="hint">New Scene</span><textarea></textarea></div>
+					<div class="card card-red" data-cardtype="red"><span class="hint">New STC Scene</span><textarea></textarea></div>
+					<div class="card card-blue" data-cardtype="blue"><span class="hint">New Note</span><textarea></textarea></div>
 				</div>
 				<div class="droppable" id="zone-trash">
 					<div class="label">Trash</div>

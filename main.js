@@ -107,6 +107,26 @@ const card_state = {
   zones: {}, // zone_id:string => [card_id:string]
 };
 
+// When _any_ <textarea> is modified, update the appropriate card
+document.oninput = (e) => {
+  const target = e.target;
+  if (target.tagName !== 'TEXTAREA') {
+    console.log(`ignoring input for element type ${target.tagName}`);
+    return;
+  }
+
+  const content = target.value;
+
+  const card_id = target.parentNode.dataset.id;
+
+  card_state.cards[card_id].content = content;
+};
+
+// half-assed state exporter
+$$('action-export').onclick = () => {
+  alert(JSON.stringify(card_state, null, 2));
+};
+
 
 
 const element_to_zone = new Map(); // DOMElement => {}
@@ -146,6 +166,7 @@ drake.on('drop', (el, target, source, sibling) => {
   }
 
   let card_id = el.dataset.id;
+  let card_type = el.dataset.cardtype;
 
   if (zone.trash) {
     console.log('DESTROY', card_id);
@@ -167,7 +188,7 @@ drake.on('drop', (el, target, source, sibling) => {
     card_move(zone.name, sibling_id, card_id);
   } else {
     // CREATE CARD
-    card_id = card_create(zone.name, sibling_id);
+    card_id = card_create(zone.name, sibling_id, card_type);
     el.dataset.id = card_id;
 
     const hint = el.getElementsByClassName('hint')[0];
@@ -186,12 +207,13 @@ drake.on('out', (el, container, source) => {
 });
 
 // Dragula provides the next/right sibling ID, not the previous/left
-function card_create(zone_name, sibling_id) {
+function card_create(zone_name, sibling_id, card_type) {
   const zone = zonename_to_zone.get(zone_name);
   const id = uuid();
 
   const card = {
     content: '',
+    type: card_type,
     zone: zone.name
   };
 

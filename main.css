@@ -109,3 +109,7 @@ body, textarea {
 #zone-toolbar .card textarea {
 	display: none;
 }
+
+.card {
+	cursor: move;
+}

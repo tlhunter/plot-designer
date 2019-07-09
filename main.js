@@ -100,7 +100,17 @@ const zones = [
   },
 ];
 
-const element_to_zone = new Map();
+
+
+const card_state = {
+  cards: {}, // card_id => {}
+  zones: {}, // zone_id:string => [card_id:string]
+};
+
+
+
+const element_to_zone = new Map(); // DOMElement => {}
+const zonename_to_zone = new Map(); // str => DOMElement
 
 const el_all = [];
 const el_sources = new Set();
@@ -110,6 +120,7 @@ for (let zone of zones) {
   const el = zone.el;
   el_all.push(el);
   element_to_zone.set(el, zone);
+  zonename_to_zone.set(zone.name, zone);
 
   if (zone.source) el_sources.add(el);
   if (zone.target) el_targets.add(el);
@@ -127,6 +138,7 @@ const drake = dragula(el_all, {
 });
 
 drake.on('drop', (el, target, source, sibling) => {
+  console.log('drop', el, target, source, sibling);
   const zone = element_to_zone.get(target);
   if (!zone) {
     // card was dropped somewhere random, ignore it
@@ -158,6 +170,15 @@ drake.on('drop', (el, target, source, sibling) => {
   }
 
   hint.parentNode.removeChild(hint);
+
+  let sibling_id = null;
+  if (sibling) {
+    sibling_id = sibling.dataset.id;
+  }
+
+  const card_id = card_create(zone.name, sibling_id);
+
+  el.dataset.id = card_id;
 });
 
 drake.on('over', (el, container, source) => {
@@ -168,4 +189,65 @@ drake.on('out', (el, container, source) => {
   container.classList.remove('hover');
 });
 
-console.log('hey');
+// Dragula provides the next/right sibling ID, not the previous/left
+function card_create(zonename, sibling_id) {
+  const zone = zonename_to_zone.get(zonename);
+  const id = uuid();
+
+  const card = {
+    content: '',
+    zone: zone.name
+  };
+
+  card_state.cards[id] = card;
+
+  if (!card_state.zones[zone.name]) {
+    card_state.zones[zone.name] = [];
+  }
+
+  const zone_list = card_state.zones[zone.name];
+
+  if (sibling_id) {
+    const sibling_index = zone_list.indexOf(sibling_id);
+    zone_list.splice(sibling_index, 0, id);
+  } else {
+    // append to end of zone
+    card_state.zones[zone.name].push(id);
+  }
+
+  return id;
+}
+
+function card_destroy(card_id) {
+  const card = card_state.cards[card_id];
+
+  if (!card) {
+    throw new Error(`Card ${id} does not exist`);
+  }
+
+  const index = card_state.zones[card.zone].indexOf(card_id);
+
+  if (index < 0) {
+    throw new Error(`Card ${card_id} does not exist in zone`);
+  }
+
+  card_state.zones[card.zone].splice(index, 1);
+  delete card_state.cards[card_id];
+}
+
+function card_move() {
+}
+
+function uuid() {
+  // http://www.ietf.org/rfc/rfc4122.txt
+  const s = [];
+  const HEX = "0123456789abcdef";
+  for (var i = 0; i < 36; i++) {
+      s[i] = HEX.substr(Math.floor(Math.random() * 0x10), 1);
+  }
+  s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+  s[19] = HEX.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+  s[8] = s[13] = s[18] = s[23] = "-";
+
+  return s.join("");
+}

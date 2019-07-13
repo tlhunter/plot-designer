@@ -131,6 +131,11 @@ function exporter() {
   return JSON.stringify(card_state, null, 2);
 }
 
+$$('action-import').onclick = () => {
+  const raw = prompt('Paste the exported story code below');
+  importer(raw);
+};
+
 function importer(payload) {
   const temp = JSON.parse(payload);
 

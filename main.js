@@ -111,7 +111,7 @@ const card_state = {
 document.oninput = (e) => {
   const target = e.target;
   if (target.tagName !== 'TEXTAREA') {
-    console.log(`ignoring input for element type ${target.tagName}`);
+    console.warn(`ignoring input for element type ${target.tagName}`);
     return;
   }
 
@@ -137,11 +137,21 @@ $$('action-import').onclick = () => {
 };
 
 function importer(payload) {
+  if (typeof payload !== 'string' || !payload) {
+    throw new Error('import must be non-empty string');
+  }
+
+  if (payload[0] !== '{') {
+    throw new Error('expected an object');
+  }
+
   const temp = JSON.parse(payload);
 
   if (!temp.zones || !temp.cards) {
     throw new Error('invalid format');
   }
+
+  destroy();
 
   for (let zone of zones) {
     const temp_list = temp.zones[zone.name];
@@ -153,19 +163,33 @@ function importer(payload) {
 
     for (let card_id of temp_list) {
       let card = temp.cards[card_id];
-      // card_create(zone.name, sibling_id, card_type)
       // There's an assymetry when creating cards normally and importing
-      // TODO: switch to Vue.js, don't let Dragula perform the element clones
       zone.el.insertAdjacentHTML(
         'beforeend',
-        // TODO: need to escape card.content, card.type
-        `<div class="card card-${card.type}" data-id="${card_id}" data-cardtype="${card.type}"><textarea>${card.content}</textarea></div>`
+        `<div class="card card-${card.type}" data-id="${card_id}" data-cardtype="${escapeHTML(card.type)}"><textarea>${card.content}</textarea></div>`
       );
     }
   }
 
   card_state.cards = temp.cards;
   card_state.zones = temp.zones;
+}
+
+function destroy() {
+  card_state.cards = {};
+  card_state.zones = {};
+  for (let zone of zones) {
+    if (!zone.target) continue;
+    zone.el.innerHTML = '';
+  }
+}
+
+function escapeHTML(input) {
+  input = input.replace(/</g, '&lt;');
+  input = input.replace(/>/g, '&gt;');
+  input = input.replace(/&/g, '&amp;');
+
+  return input;
 }
 
 
@@ -199,7 +223,6 @@ const drake = dragula(el_all, {
 });
 
 drake.on('drop', (el, target, source, sibling) => {
-  console.log('drop', el, target, source, sibling);
   const zone = element_to_zone.get(target);
   if (!zone) {
     // card was dropped somewhere random, ignore it
@@ -210,7 +233,6 @@ drake.on('drop', (el, target, source, sibling) => {
   let card_type = el.dataset.cardtype;
 
   if (zone.trash) {
-    console.log('DESTROY', card_id);
     el.parentNode.removeChild(el);
     // if user is dropping a new card there will be no ID
     if (card_id) {
@@ -224,11 +246,9 @@ drake.on('drop', (el, target, source, sibling) => {
     sibling_id = sibling.dataset.id;
   }
 
-  if (card_id) {
-    // MOVE CARD
+  if (card_id) { // MOVE
     card_move(zone.name, sibling_id, card_id);
-  } else {
-    // CREATE CARD
+  } else { // CREATE
     card_id = card_create(zone.name, sibling_id, card_type);
     el.dataset.id = card_id;
 
@@ -237,14 +257,6 @@ drake.on('drop', (el, target, source, sibling) => {
   }
 
   el.getElementsByTagName('textarea')[0].focus();
-});
-
-drake.on('over', (el, container, source) => {
-  container.classList.add('hover');
-});
-
-drake.on('out', (el, container, source) => {
-  container.classList.remove('hover');
 });
 
 // Dragula provides the next/right sibling ID, not the previous/left
@@ -267,10 +279,11 @@ function card_create(zone_name, sibling_id, card_type) {
   const zone_list = card_state.zones[zone.name];
 
   if (sibling_id) {
+    // Insert before Sibling
     const sibling_index = zone_list.indexOf(sibling_id);
     zone_list.splice(sibling_index, 0, id);
   } else {
-    // append to end of zone
+    // Append at end
     card_state.zones[zone.name].push(id);
   }
 
@@ -295,15 +308,12 @@ function card_destroy(card_id) {
 }
 
 function card_move(new_zone_name, sibling_id, card_id) {
-  console.log('MOVE', arguments);
   const card = card_state.cards[card_id];
 
   const old_zone_name = card.zone;
   card.zone = new_zone_name;
 
-  console.log('old', old_zone_name);
   const index = card_state.zones[old_zone_name].indexOf(card_id);
-  console.log('old move index', index);
   card_state.zones[old_zone_name].splice(index, 1); // remove from old
 
   if (sibling_id) {
@@ -317,17 +327,13 @@ function card_move(new_zone_name, sibling_id, card_id) {
   }
 }
 
-function uuid() {
-  // http://www.ietf.org/rfc/rfc4122.txt
-  const s = [];
-  const HEX = "0123456789abcdef";
-  for (var i = 0; i < 36; i++) {
-      // TODO: Bad impl, requires 36 rand, should
-      s[i] = HEX.substr(Math.floor(Math.random() * 0x10), 1);
-  }
-  s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
-  s[19] = HEX.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-  s[8] = s[13] = s[18] = s[23] = "-";
+function uuid(len = 8) {
+  const pool = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let output = '';
 
-  return s.join("");
+  for (let i = 0; i < len; i++) {
+    output += pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  return output;
 }

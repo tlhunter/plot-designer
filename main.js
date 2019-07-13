@@ -124,8 +124,44 @@ document.oninput = (e) => {
 
 // half-assed state exporter
 $$('action-export').onclick = () => {
-  alert(JSON.stringify(card_state, null, 2));
+  alert(exporter());
 };
+
+function exporter() {
+  return JSON.stringify(card_state, null, 2);
+}
+
+function importer(payload) {
+  const temp = JSON.parse(payload);
+
+  if (!temp.zones || !temp.cards) {
+    throw new Error('invalid format');
+  }
+
+  for (let zone of zones) {
+    const temp_list = temp.zones[zone.name];
+
+    if (!temp_list || !temp_list.length) {
+      // no cards imported in this zone
+      continue;
+    }
+
+    for (let card_id of temp_list) {
+      let card = temp.cards[card_id];
+      // card_create(zone.name, sibling_id, card_type)
+      // There's an assymetry when creating cards normally and importing
+      // TODO: switch to Vue.js, don't let Dragula perform the element clones
+      zone.el.insertAdjacentHTML(
+        'beforeend',
+        // TODO: need to escape card.content, card.type
+        `<div class="card card-${card.type}" data-id="${card_id}" data-cardtype="${card.type}"><textarea>${card.content}</textarea></div>`
+      );
+    }
+  }
+
+  card_state.cards = temp.cards;
+  card_state.zones = temp.zones;
+}
 
 
 
@@ -281,6 +317,7 @@ function uuid() {
   const s = [];
   const HEX = "0123456789abcdef";
   for (var i = 0; i < 36; i++) {
+      // TODO: Bad impl, requires 36 rand, should
       s[i] = HEX.substr(Math.floor(Math.random() * 0x10), 1);
   }
   s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010

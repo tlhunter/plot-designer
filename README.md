@@ -1,9 +1,7 @@
 # Three Act Structure
 
-WIP project to allow easily dragging and dropping of scenes.
+This is a simple drag and drop browser UI for designing story plots.
 
-Scene structure will be opinionated and inspired by 'Save the Cat!'.
+![Screenshot](./screenshot.png)
 
-Each card will have a description and a target word count. Sections will have expected word count.
-
-Will also have a system for importing/exporting JSON representations and rendering to Markdown.
+This project does not require a web server to function. Stories will be saved in Local Storage. They can also be exported to and imported from a file on disk.

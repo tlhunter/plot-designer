@@ -103,28 +103,31 @@ const zones = [
 
 
 const card_state = {
+  title: 'New Project',
   cards: {}, // card_id => {}
   zones: {}, // zone_id:string => [card_id:string]
 };
 
-// When _any_ <textarea> is modified, update the appropriate card
+const $title = $$('title');
+
+// Input events for any textarea or other form input calls this function
 document.oninput = (e) => {
   const target = e.target;
-  if (target.tagName !== 'TEXTAREA') {
-    console.warn(`ignoring input for element type ${target.tagName}`);
-    return;
+
+  if (target.tagName === 'TEXTAREA') {
+    const content = target.value;
+
+    const card_id = target.parentNode.dataset.id;
+
+    card_state.cards[card_id].content = content;
+  } else if (target === $title) {
+    card_state.title = target.value;
   }
-
-  const content = target.value;
-
-  const card_id = target.parentNode.dataset.id;
-
-  card_state.cards[card_id].content = content;
 };
 
-// half-assed state exporter
 $$('action-export').onclick = () => {
-  alert(exporter());
+  const title = $title.value;
+  download(slug(title) + '.json', exporter());
 };
 
 function exporter() {
@@ -147,7 +150,7 @@ function importer(payload) {
 
   const temp = JSON.parse(payload);
 
-  if (!temp.zones || !temp.cards) {
+  if (!temp.zones || !temp.cards || !temp.title) {
     throw new Error('invalid format');
   }
 
@@ -173,11 +176,14 @@ function importer(payload) {
 
   card_state.cards = temp.cards;
   card_state.zones = temp.zones;
+  card_state.title = temp.title;
+  $title.value = temp.title;
 }
 
 function destroy() {
   card_state.cards = {};
   card_state.zones = {};
+  card_state.title = 'New Project';
   for (let zone of zones) {
     if (!zone.target) continue;
     zone.el.innerHTML = '';
@@ -336,4 +342,28 @@ function uuid(len = 8) {
   }
 
   return output;
+}
+
+function slug(title) {
+  title = title.toLowerCase();
+  title = title.replace(/[^a-zA-Z0-9]+/g,'-');
+  title = title.replace(/[-]+/g, '-');
+  title = title.replace(/^[-]/g, '');
+  title = title.replace(/[-]$/g, '');
+  return title;
+}
+
+// https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+// Could have a link with an `href` which changes with every keypress... but that would be slow
+function download(filename, text) {
+  const element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }

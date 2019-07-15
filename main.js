@@ -109,6 +109,7 @@ const card_state = {
 };
 
 const $title = $$('title');
+const $file = $$('action-file-import');
 
 // Input events for any textarea or other form input calls this function
 document.oninput = (e) => {
@@ -120,24 +121,52 @@ document.oninput = (e) => {
     const card_id = target.parentNode.dataset.id;
 
     card_state.cards[card_id].content = content;
+    save(false);
   } else if (target === $title) {
     card_state.title = target.value;
+    save(false);
   }
 };
 
 $$('action-export').onclick = () => {
-  const title = $title.value;
-  download(slug(title) + '.json', exporter());
+  const title = card_state.title;
+  download(
+    (slug(title) || 'new-project') + '.json',
+    exporter()
+  );
+};
+
+$$('action-destroy').onclick = () => {
+  const sure = confirm("Are you sure you want COMPLETELY DESTROY your project and start over?");
+
+  if (!sure) {
+    return;
+  }
+
+  destroy();
+  $title.value = "";
+
+  localStorage.removeItem('scratch-story');
 };
 
 function exporter() {
   return JSON.stringify(card_state, null, 2);
 }
 
-$$('action-import').onclick = () => {
-  const raw = prompt('Paste the exported story code below');
-  importer(raw);
-};
+{
+  $$('action-import').onclick = () => {
+    $file.click();
+  };
+
+  $file.onchange = (event) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      importer(event.target.result);
+    };
+
+    reader.readAsText(event.target.files[0]);
+  };
+}
 
 function importer(payload) {
   if (typeof payload !== 'string' || !payload) {
@@ -174,10 +203,12 @@ function importer(payload) {
     }
   }
 
+  $title.value = temp.title;
+
   card_state.cards = temp.cards;
   card_state.zones = temp.zones;
   card_state.title = temp.title;
-  $title.value = temp.title;
+  save(true);
 }
 
 function destroy() {
@@ -186,8 +217,10 @@ function destroy() {
   card_state.title = 'New Project';
   for (let zone of zones) {
     if (!zone.target) continue;
+    if (zone.trash) continue;
     zone.el.innerHTML = '';
   }
+  save(true);
 }
 
 function escapeHTML(input) {
@@ -293,6 +326,8 @@ function card_create(zone_name, sibling_id, card_type) {
     card_state.zones[zone.name].push(id);
   }
 
+  save(true);
+
   return id;
 }
 
@@ -311,6 +346,8 @@ function card_destroy(card_id) {
 
   card_state.zones[card.zone].splice(index, 1);
   delete card_state.cards[card_id];
+
+  save(true);
 }
 
 function card_move(new_zone_name, sibling_id, card_id) {
@@ -331,6 +368,8 @@ function card_move(new_zone_name, sibling_id, card_id) {
     }
     card_state.zones[new_zone_name].push(card_id);
   }
+
+  save(true);
 }
 
 function uuid(len = 8) {
@@ -367,3 +406,42 @@ function download(filename, text) {
 
   document.body.removeChild(element);
 }
+
+const debounceSave = debounce(() => save(true), 300, false);
+
+function save(immediate) {
+  if (immediate) {
+    console.log('SAVE');
+    localStorage.setItem('scratch-story', JSON.stringify(card_state));
+  } else {
+    debounceSave();
+  }
+}
+
+function load() {
+  const scratch = localStorage.getItem('scratch-story');
+  if (!scratch) {
+    console.log('no scratch state to load');
+    return;
+  }
+
+  importer(scratch);
+}
+
+load();
+
+function debounce(func, wait, immediate) {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    const later = function() {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};

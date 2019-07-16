@@ -1,6 +1,6 @@
-# Three Act Structure
+# Plot Designer
 
-This is a simple drag and drop browser UI for designing story plots.
+Try the [Plot Designer](https://thomashunter.name/plot-designer/) online. This is a simple drag and drop browser UI for designing story plots. Project _only_ works on desktop for now.
 
 ![Screenshot](./screenshot.png)
 

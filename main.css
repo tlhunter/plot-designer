@@ -97,16 +97,24 @@ body, textarea {
 }
 #zone-trash {
 	display: inline-block;
-	margin-left: 10px;
+	margin-left: 40px;
 	border: 1px dotted red;
-}
-#zone-trash .label {
-	display: block;
 	text-align: center;
-	line-height: 90px;
-	color: red;
-	position: absolute;
-	width: 100px;
+	line-height: 100px;
+	font-size: 50px;
+	min-width: 100px;
+	min-height: 100px;
+	max-width: 100px;
+	max-height: 100px;
+	overflow: hidden;
+}
+#zone-trash:before {
+	content: '❌';
+	opacity: 0.5;
+}
+#zone-trash.discard {
+	background-color: #ffcccc;
+	border-style: solid;
 }
 
 #zone-toolbar .card textarea {

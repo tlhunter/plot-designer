@@ -224,6 +224,7 @@ function destroy() {
 }
 
 function escapeHTML(input) {
+  input = input || '';
   input = input.replace(/</g, '&lt;');
   input = input.replace(/>/g, '&gt;');
   input = input.replace(/&/g, '&amp;');
@@ -296,6 +297,26 @@ drake.on('drop', (el, target, source, sibling) => {
   }
 
   el.getElementsByTagName('textarea')[0].focus();
+});
+
+drake.on('over', (el, container, source) => {
+  const zone = element_to_zone.get(container);
+
+  if (!zone) return;
+
+  if (zone.trash) {
+    zone.el.classList.add('discard');
+  }
+});
+
+drake.on('out', (el, container, source) => {
+  const zone = element_to_zone.get(container);
+
+  if (!zone) return;
+
+  if (zone.trash) {
+    zone.el.classList.remove('discard');
+  }
 });
 
 // Dragula provides the next/right sibling ID, not the previous/left
